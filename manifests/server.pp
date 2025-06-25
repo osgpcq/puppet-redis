@@ -180,7 +180,7 @@ define redis::server (
   $redis_group             = $::redis::install::redis_group
 
   $redis_install_dir = $::redis::install::redis_install_dir
-  $redis_init_script = $::operatingsystem ? {
+  $redis_init_script = $facts['os']['name'] ? {
     /(Debian|Ubuntu)/                                          => 'redis/etc/init.d/debian_redis-server.erb',
     /(Fedora|RedHat|CentOS|OEL|OracleLinux|Amazon|Scientific)/ => 'redis/etc/init.d/redhat_redis-server.erb',
     /(SLES)/                                                   => 'redis/etc/init.d/sles_redis-server.erb',
@@ -200,21 +200,21 @@ define redis::server (
   }
 
   # startup script
-  case $::operatingsystem {
+  case $facts['os']['name'] {
     'Fedora', 'RedHat', 'CentOS', 'OEL', 'OracleLinux', 'Amazon', 'Scientific': {
-      if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
+      if versioncmp($facts['os']['release']['major'], '7') >= 0 {
         $has_systemd = true
         $service_file = "/usr/lib/systemd/system/redis-server_${redis_name}.service"
       }
     }
     'Debian': {
-      if versioncmp($::operatingsystemmajrelease, '8') >= 0 {
+      if versioncmp($facts['os']['release']['major'], '8') >= 0 {
         $has_systemd = true
         $service_file = "/etc/systemd/system/redis-server_${redis_name}.service"
       }
     }
     'Ubuntu': {
-      if versioncmp($::operatingsystemmajrelease, '15.04') >= 0 {
+      if versioncmp($facts['os']['release']['major'], '15.04') >= 0 {
         $has_systemd = true
         $service_file = "/etc/systemd/system/redis-server_${redis_name}.service"
       }
